@@ -6,6 +6,8 @@ import { injectAppConfig } from '../shared/config/config.di';
 import { FooterComponent, HeaderComponent } from '../layout';
 
 import { CloudWatchLogsClient, PutLogEventsCommand } from "@aws-sdk/client-cloudwatch-logs";
+import { AWSCloudWatchLogsService } from '../shared/services';
+import { AWS_CLOUD_WATCH } from '../shared/constant';
 
 @Component({
   selector: 'tmp-main',
@@ -22,63 +24,26 @@ import { CloudWatchLogsClient, PutLogEventsCommand } from "@aws-sdk/client-cloud
   ],
 })
 export class MainComponent {
-  private readonly appConfig = injectAppConfig();
 
-  // Create an instance of the CloudWatchLogsClient with AWS credentials
-  client: CloudWatchLogsClient = null
+  private _httpClient = inject(HttpClient);
+  constructor() {}
 
-  // Define the log group and log stream names
-  logGroupName = "angular-app-logs";
-  logStreamName = "AllLog";
-
-  // Define the log events to be sent
-  logEvents = [
-    { timestamp: Date.now(), message: "ERROR properties is not undifined" },
-  ];
-
-  private _httpClient = inject(HttpClient)
-  constructor() {
-    console.log('appConfig initialize...', this.appConfig)
-    this.client = new CloudWatchLogsClient({
-      region: "ap-southeast-1", // Replace with your desired AWS region
-      credentials: {
-        accessKeyId: this.appConfig.awsAccessKeyId,
-        secretAccessKey: this.appConfig.awsSecretAccessKey
-      }
-    })
-
-    console.log('client...', this.client)
-    // this.sendLogEvents();
-    this._httpClient.get("http://localhost:4201/api/post")
-      .subscribe({
-        next: (res) => { },
-        error: (err) => {
-          console.log(err)
-          this.sendLogEvents({ timestamp: Date.now(), message: err?.message ?? '' });
-        }
-      },
-      )
+  showLog() {
+    throw new Error("Global Error....")
   }
 
-
-  // Create a function to send log events to CloudWatch Logs
-  async sendLogEvents(object) {
-    try {
-      // Create the PutLogEventsCommand
-      const command = new PutLogEventsCommand({
-        logGroupName: this.logGroupName,
-        logStreamName: this.logStreamName,
-        logEvents: [object],
-      });
-
-      // Send the log events
-      const response = await this.client.send(command);
-      console.log("Log events successfully sent:", response);
-    } catch (error) {
-      console.error("Error sending log events:", error);
-    }
+  show403() {
+    this._httpClient.get("http://localhost:4201/api/login")
+      .subscribe()
   }
 
-  // Call the  to send log events
+  show404() {
+    this._httpClient.get("http://localhost:4201")
+      .subscribe()
+  }
 
+  show500() {
+    this._httpClient.get("http://localhost:4201/api/users")
+      .subscribe()
+  }
 }

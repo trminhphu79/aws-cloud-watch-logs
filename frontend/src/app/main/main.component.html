@@ -3,5 +3,10 @@
   <main class="container">
     <router-outlet></router-outlet>
   </main>
+
+  <button (click)="showLog()">Show global log</button>
+  <button (click)="show403()">Show Error 403 </button>
+  <button (click)="show404()">Show Error 404 </button>
+  <button (click)="show500()">Show Error 500</button>
   <tmp-footer></tmp-footer>
 </ng-container>

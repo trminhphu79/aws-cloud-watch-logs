@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
-import { Component, importProvidersFrom } from '@angular/core';
+import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { Component, ErrorHandler, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, provideRouter } from '@angular/router';
-import { provideAppConfig } from './shared/config/config.di';
+import { GlobalErrorHandlerService } from './shared/services/global-error-handler.service';
+import { provideAwsConfig } from './shared/config/aws-config.di';
+import { AuthorizationInterceptor } from './shared/auth/interceptor.auth';
+import { GlobalInterceptorErrorHandler } from './shared/services/global-error-interceptor-handler.service';
 
 @Component({
   selector: 'tmp-root',
@@ -30,7 +33,16 @@ export class AppComponent {
           BrowserAnimationsModule,
           HttpClientModule
         ),
-        provideAppConfig(config),
+        provideAwsConfig(config),
+        {
+          provide: ErrorHandler,
+          useClass: GlobalErrorHandlerService
+        },
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: GlobalInterceptorErrorHandler,
+          multi: true
+        }
       ]
     }).catch(err => console.error(err));
   }
